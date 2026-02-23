@@ -1,0 +1,134 @@
+info:
+  name: Create an address from a search word
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/addresses"
+  body:
+    type: json
+    data: |-
+      {
+        "searchWord": "",
+        "name": "",
+        "description": ""
+      }
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Address created
+    request:
+      url: "{{baseUrl}}/api/addresses"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "searchWord": "",
+            "name": "",
+            "description": ""
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "item": {
+              "id": 0,
+              "name": "",
+              "description": "",
+              "lng": 0,
+              "lat": 0,
+              "createdAt": ""
+            }
+          }
+  - name: 400 Response
+    description: Validation error
+    request:
+      url: "{{baseUrl}}/api/addresses"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "searchWord": "",
+            "name": "",
+            "description": ""
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 403 Response
+    description: Access denied
+    request:
+      url: "{{baseUrl}}/api/addresses"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "searchWord": "",
+            "name": "",
+            "description": ""
+          }
+    response:
+      status: 403
+      statusText: Forbidden
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
+  - name: 404 Response
+    description: Search word not found
+    request:
+      url: "{{baseUrl}}/api/addresses"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "searchWord": "",
+            "name": "",
+            "description": ""
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "message": ""
+          }
