@@ -1,0 +1,39 @@
+name: Server Tests
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "server/**"
+      - ".github/workflows/server-tests.yml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "server/**"
+      - ".github/workflows/server-tests.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        working-directory: server
+
+      - name: Run tests
+        run: yarn test
+        working-directory: server
