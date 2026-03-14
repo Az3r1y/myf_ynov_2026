@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 
 type HttpMethod = "GET" | "POST";
 
@@ -7,6 +7,10 @@ function App() {
   const [email, setEmail] = useState("test@example.com");
   const [password, setPassword] = useState("secret123");
   const [token, setToken] = useState("");
+  const [activeAuthView, setActiveAuthView] = useState<"signup" | "login">(
+    "signup",
+  );
+  const [toastMessage, setToastMessage] = useState("");
   const [searchWord, setSearchWord] = useState("Paris");
   const [addressName, setAddressName] = useState("Maison");
   const [description, setDescription] = useState("Chez moi");
@@ -17,11 +21,6 @@ function App() {
   const [lastRequest, setLastRequest] = useState("");
   const [statusCode, setStatusCode] = useState<number | null>(null);
   const [responseBody, setResponseBody] = useState<string>("");
-
-  const authHeader = useMemo(
-    () => (token ? { Authorization: `Bearer ${token}` } : {}),
-    [token],
-  );
 
   async function callApi(
     method: HttpMethod,
@@ -35,12 +34,16 @@ function App() {
     setResponseBody("");
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (withAuth && token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${baseUrl}${path}`, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          ...(withAuth ? authHeader : {}),
-        },
+        headers,
         body: body ? JSON.stringify(body) : undefined,
       });
 
@@ -67,15 +70,23 @@ function App() {
 
   async function createUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await callApi("POST", "/api/users", { email, password });
+    const json = await callApi("POST", "/api/users", { email, password });
+    if (json && json.item) {
+      setToastMessage("Signup successful");
+      setActiveAuthView("login");
+    } else {
+      setToastMessage("Signup failed");
+    }
   }
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setToastMessage("");
     const json = await callApi("POST", "/api/users/tokens", { email, password });
     const nextToken = json && typeof json.token === "string" ? json.token : "";
     if (nextToken) {
       setToken(nextToken);
+      setToastMessage("Login successful");
     }
   }
 
@@ -148,50 +159,86 @@ function App() {
 
       <section className="panel">
         <h2>Users</h2>
-        <form className="inline-form" onSubmit={createUser}>
-          <input
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="email"
-            type="email"
-            required
-          />
-          <input
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="password"
-            type="password"
-            required
-          />
-          <button type="submit" disabled={loading}>
-            Create User
+        <div className="inline-form">
+          <button
+            data-testid="signup-button"
+            type="button"
+            onClick={() => setActiveAuthView("signup")}
+          >
+            Signup
           </button>
-        </form>
-
-        <form className="inline-form" onSubmit={login}>
-          <input
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="email"
-            type="email"
-            required
-          />
-          <input
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="password"
-            type="password"
-            required
-          />
-          <button type="submit" disabled={loading}>
+          <button
+            data-testid="switch-login-button"
+            type="button"
+            onClick={() => setActiveAuthView("login")}
+          >
             Login
           </button>
-        </form>
+        </div>
+
+        {activeAuthView === "signup" ? (
+          <form className="inline-form" onSubmit={createUser}>
+            <input
+              data-testid="signup-email-input"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="email"
+              type="email"
+              required
+            />
+            <input
+              data-testid="signup-password-input"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="password"
+              type="password"
+              required
+            />
+            <button data-testid="signup-submit-button" type="submit" disabled={loading}>
+              Submit Signup
+            </button>
+          </form>
+        ) : (
+          <form className="inline-form" onSubmit={login}>
+            <input
+              data-testid="login-email-input"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="email"
+              type="email"
+              required
+            />
+            <input
+              data-testid="login-password-input"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="password"
+              type="password"
+              required
+            />
+            <button data-testid="login-submit-button" type="submit" disabled={loading}>
+              Login
+            </button>
+          </form>
+        )}
+
+        {toastMessage ? (
+          <p data-testid="auth-toast" role="status">
+            {toastMessage}
+          </p>
+        ) : null}
 
         <button type="button" onClick={getMe} disabled={loading || !token}>
           GET /api/users/me
         </button>
       </section>
+
+      {token ? (
+        <section className="panel" data-testid="dashboard">
+          <h2>Dashboard</h2>
+          <p>Connected user token is ready.</p>
+        </section>
+      ) : null}
 
       <section className="panel">
         <h2>Addresses</h2>

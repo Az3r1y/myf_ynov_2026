@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "email": "",
-        "password": ""
+        "email": "{{userEmail}}",
+        "password": "{{userPassword}}"
       }
   auth: inherit
 
@@ -31,8 +31,8 @@ examples:
         type: json
         data: |-
           {
-            "email": "",
-            "password": ""
+            "email": "{{userEmail}}",
+            "password": "{{userPassword}}"
           }
     response:
       status: 200
@@ -55,8 +55,8 @@ examples:
         type: json
         data: |-
           {
-            "email": "",
-            "password": ""
+            "email": "{{userEmail}}",
+            "password": "{{userPassword}}"
           }
     response:
       status: 400

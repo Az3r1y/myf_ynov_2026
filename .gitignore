@@ -1,6 +1,15 @@
 # macOS
 .DS_Store
 
+# Course PDFs and local planning docs
+*.pdf
+PLAN_DEV_TEST.md
+
+# SQLite database
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
 # Dependencies
 node_modules/
 **/node_modules/
@@ -9,6 +18,15 @@ node_modules/
 dist/
 build/
 .vite/
+coverage/
+**/coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Generated from local TypeScript builds
+client/vite.config.js
+client/vite.config.d.ts
 
 # Logs
 npm-debug.log*

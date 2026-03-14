@@ -2,3 +2,9 @@ name: Local development server
 variables:
   - name: baseUrl
     value: http://localhost:3000
+  - name: userEmail
+    value: test@test.com
+  - name: userPassword
+    value: supersecret
+  - name: token
+    value: ""
