@@ -10,7 +10,7 @@ A full-stack application to save and search your favorite addresses with geoloca
 |---|---|
 | API server | Express 5, TypeScript, TypeORM, SQLite (better-sqlite3) |
 | Auth | Argon2 (password hashing), JWT (jsonwebtoken) |
-| Geocoding | [data.geopf.fr](https://data.geopf.fr) — French national geocoding API |
+| Geocoding | [Géoplateforme IGN](https://geoservices.ign.fr/services-geoplateforme-diffusion) — French national geocoding API |
 | Client | React 18, Vite 5, TypeScript |
 | Unit / Integration tests | Jest, ts-jest, Supertest, faker-js |
 | E2E tests | Playwright (Chromium) |
