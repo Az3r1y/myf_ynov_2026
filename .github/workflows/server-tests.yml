@@ -1,18 +1,14 @@
-name: Server Tests
+name: CI
 
 on:
   push:
     branches:
-      - master
-    paths:
-      - "server/**"
-      - ".github/workflows/server-tests.yml"
+      - main
+      - dev
   pull_request:
     branches:
-      - master
-    paths:
-      - "server/**"
-      - ".github/workflows/server-tests.yml"
+      - main
+      - dev
 
 jobs:
   test:
@@ -26,6 +22,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: yarn
+          cache-dependency-path: server/yarn.lock
 
       - name: Enable Corepack
         run: corepack enable
@@ -34,6 +32,14 @@ jobs:
         run: yarn install --frozen-lockfile
         working-directory: server
 
-      - name: Run tests
-        run: yarn test
+      - name: Run tests with coverage
+        run: yarn test:coverage
         working-directory: server
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: server/coverage/
+          retention-days: 7
